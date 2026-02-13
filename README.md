@@ -13,9 +13,22 @@ It provides a web interface for real-time image upload and prediction.
 
 ## 📁 Project Structure
 
-dustbin_app/ │ ├── app.py ├── dustbin_overflow_cnn.h5 ├──
-requirements.txt │ ├── static/ │ └── uploads/ │ ├── templates/ │ └──
-index.html │ ├── dataset/ │ ├── overflow/ │ └── normal/ │ └── README.md
+dustbin_app/ 
+
+├── app.py 
+
+├── dustbin_overflow_cnn.h5
+
+├── static/ 
+
+  └── uploads/
+
+├── templates/ 
+
+  └──index.html 
+
+
+└── README.md
 
 ------------------------------------------------------------------------
 
@@ -26,6 +39,8 @@ index.html │ ├── dataset/ │ ├── overflow/ │ └── normal/ 
 2.  Run application: python app.py
 
 3.  Open browser: http://127.0.0.1:5000/
+   
+4.  Download CNN Image Trained Model from Drive : https://drive.google.com/file/d/1zdG_ceI4xJj9O7P36pVB1a_jCIXmF5cO/view?usp=drive_link
 
 ------------------------------------------------------------------------
 
