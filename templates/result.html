@@ -1,0 +1,177 @@
+<!-- htmlhint jinja2:false -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Result - Smart Dustbin Detector</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .reveal {
+            opacity: 0;
+            transform: translateY(14px);
+            animation: fadeUp 0.7s ease-out forwards;
+            will-change: opacity, transform;
+        }
+        .delay-1 { animation-delay: 0.08s; }
+        .delay-2 { animation-delay: 0.16s; }
+        .delay-3 { animation-delay: 0.24s; }
+        .delay-4 { animation-delay: 0.32s; }
+        .lift {
+            transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+        }
+        .lift:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 24px 40px rgba(2, 6, 23, 0.45);
+        }
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .reveal {
+                animation: none;
+                opacity: 1;
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body class="relative min-h-screen flex flex-col bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-slate-100 overflow-x-hidden" data-is-overflow="{{ 'true' if prediction == 'overflow' else 'false' }}">
+
+    <div class="pointer-events-none absolute inset-0">
+        <div class="absolute -top-24 -left-20 h-72 w-72 rounded-full bg-indigo-500/20 blur-3xl"></div>
+        <div class="absolute top-1/4 -right-20 h-72 w-72 rounded-full {% if prediction == 'overflow' %}bg-red-500/20{% else %}bg-emerald-500/20{% endif %} blur-3xl"></div>
+        <div class="absolute -bottom-24 left-1/3 h-72 w-72 rounded-full bg-cyan-500/20 blur-3xl"></div>
+    </div>
+
+    <nav class="relative z-10 border-b border-white/10 bg-slate-900/60 backdrop-blur-xl">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <div class="h-10 w-10 rounded-xl {% if prediction == 'overflow' %}bg-red-500/20 border-red-300/30{% else %}bg-emerald-500/20 border-emerald-300/30{% endif %} border flex items-center justify-center">
+                        <i class="fa-solid fa-trash-can {% if prediction == 'overflow' %}text-red-300{% else %}text-emerald-300{% endif %} text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg sm:text-xl font-bold text-white">CleanCity Intelligence</h1>
+                        <p class="text-xs text-slate-300">Detection Analysis Report</p>
+                    </div>
+                </div>
+                <span class="hidden sm:inline-flex px-3 py-1 rounded-full text-xs font-semibold border {% if prediction == 'overflow' %}border-red-300/30 bg-red-500/10 text-red-200{% else %}border-emerald-300/30 bg-emerald-500/10 text-emerald-200{% endif %}">
+                    {% if prediction == 'overflow' %}Critical Alert{% else %}Normal Status{% endif %}
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="relative z-10 flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
+        <div class="reveal delay-1 text-center mb-8">
+            <h2 class="text-3xl sm:text-4xl font-bold text-white">Analysis Result</h2>
+            <p class="text-slate-300 mt-2">High-visibility report generated for your uploaded dustbin image.</p>
+        </div>
+
+        <div class="grid lg:grid-cols-5 gap-6">
+            <div class="reveal delay-2 lift lg:col-span-3 rounded-3xl border border-white/10 bg-slate-900/60 backdrop-blur-xl p-6 shadow-2xl shadow-slate-950/40">
+                <h3 class="text-lg font-semibold text-white mb-4">Uploaded Image</h3>
+                <div class="rounded-2xl overflow-hidden border border-white/10 bg-slate-800/70">
+                    <img src="{{ image_url }}" alt="Uploaded Dustbin" class="object-cover w-full h-80">
+                </div>
+            </div>
+
+            <div class="reveal delay-3 lift lg:col-span-2 rounded-3xl border border-white/10 bg-slate-900/60 backdrop-blur-xl p-6 shadow-2xl shadow-slate-950/40">
+                <h3 class="text-lg font-semibold text-white mb-4">Detection Output</h3>
+
+                <div class="text-center py-2">
+                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-4 border {% if prediction == 'overflow' %}bg-red-500/15 border-red-300/30 text-red-300{% else %}bg-emerald-500/15 border-emerald-300/30 text-emerald-300{% endif %}">
+                        {% if prediction == 'overflow' %}
+                            <i class="fa-solid fa-triangle-exclamation text-3xl"></i>
+                        {% else %}
+                            <i class="fa-solid fa-check text-3xl"></i>
+                        {% endif %}
+                    </div>
+
+                    <h4 class="text-3xl font-bold mb-1 capitalize {% if prediction == 'overflow' %}text-red-300{% else %}text-emerald-300{% endif %}">
+                        {{ prediction }}
+                    </h4>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">Status</p>
+                </div>
+
+                <div class="lift mt-5 rounded-2xl border border-white/10 bg-slate-800/70 p-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium text-slate-200">Confidence Score</span>
+                        <span class="text-sm font-bold text-white">{{ confidence }}%</span>
+                    </div>
+                    <div class="w-full bg-slate-700 rounded-full h-2.5">
+                        <div class="h-2.5 rounded-full {% if prediction == 'overflow' %}bg-red-400{% else %}bg-emerald-400{% endif %}" style="width: 0%;" data-width="{{ confidence }}"></div>
+                    </div>
+                </div>
+
+                {% if prediction == 'overflow' %}
+                <div class="mt-4 text-sm text-red-200 bg-red-500/10 border border-red-300/20 rounded-xl p-3">
+                    Alert generated at {{ detected_at }}.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if prediction == 'overflow' %}
+        <div class="reveal delay-4 lift mt-6 rounded-3xl border border-red-300/20 bg-slate-900/70 backdrop-blur-xl p-6 shadow-2xl shadow-red-950/20">
+            <h3 class="text-xl font-semibold text-red-300 mb-5">Detailed Overflow Report</h3>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="lift rounded-2xl border border-white/10 bg-slate-800/70 p-4">
+                    <p class="text-xs uppercase tracking-wider text-slate-400">Date</p>
+                    <p class="text-sm font-semibold text-white mt-1">{{ detected_date or 'Not Available' }}</p>
+                </div>
+                <div class="lift rounded-2xl border border-white/10 bg-slate-800/70 p-4">
+                    <p class="text-xs uppercase tracking-wider text-slate-400">Time</p>
+                    <p class="text-sm font-semibold text-white mt-1">{{ detected_time or 'Not Available' }}</p>
+                </div>
+                <div class="lift rounded-2xl border border-white/10 bg-slate-800/70 p-4 sm:col-span-2 lg:col-span-2">
+                    <p class="text-xs uppercase tracking-wider text-slate-400">Location</p>
+                    <p class="text-sm font-semibold text-white mt-1 break-words">{{ detected_location }}</p>
+                </div>
+                <div class="lift rounded-2xl border border-red-300/20 bg-red-500/10 p-4 sm:col-span-2 lg:col-span-4">
+                    <p class="text-xs uppercase tracking-wider text-red-300">Message Sent To Officers</p>
+                    <p class="text-sm font-semibold text-red-200 mt-1">{{ officer_message }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="reveal delay-4 mt-8 text-center">
+            <a href="{{ url_for('index') }}" class="inline-flex lift items-center px-6 py-3 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-500 transition-all">
+                <i class="fa-solid fa-arrow-left mr-2"></i>
+                Analyze Another Image
+            </a>
+        </div>
+    </main>
+
+    <footer class="relative z-10 mt-auto border-t border-white/10 bg-slate-900/60 backdrop-blur-xl">
+        <div class="max-w-6xl mx-auto py-5 px-4 sm:px-6 lg:px-8 text-center space-y-2">
+            <p class="text-sm text-slate-300">&copy; 2026 CleanCity AI Project. Intelligent visual reporting for sanitation teams.</p>
+            <p class="text-sm text-slate-200">Developed by Ameer Hussain Shaik ·
+                <a href="https://www.linkedin.com/in/ameer-hussain-shaik-am18112002/" target="_blank" rel="noopener noreferrer" class="font-semibold text-cyan-300 hover:text-cyan-200 underline underline-offset-4">LinkedIn Profile</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        const isOverflowDetected = document.body.dataset.isOverflow === 'true';
+        const confidenceBar = document.querySelector('[data-width]');
+        if (confidenceBar) {
+            confidenceBar.style.width = confidenceBar.getAttribute('data-width') + '%';
+        }
+
+        if (isOverflowDetected) {
+            window.addEventListener('load', () => {
+                alert('OVERFLOW DETECTED! LOCATION AND TIME IS SENT TO MUNICIPAL OFFICERS AND LOCAL AREA SANITIZATION WORKERS.');
+            });
+        }
+    </script>
+</body>
+</html>
