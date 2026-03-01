@@ -25,7 +25,9 @@ dustbin_app/
 
 ├── templates/ 
 
-  └──index.html 
+  └──index.html
+  
+  └──result.html
 
 
 └── README.md
